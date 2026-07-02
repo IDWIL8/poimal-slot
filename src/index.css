@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; font-family: Manrope, sans-serif; }
+:root.dark { color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; background: #f7f5ef; color: #252621; }
+.dark body { background: #151613; color: #f5f4ed; }
+::selection { background: #dff26d; color: #252621; }
+
+@layer components {
+  .surface { @apply rounded-[28px] border border-black/[.07] bg-white/80 shadow-soft backdrop-blur-xl dark:border-white/10 dark:bg-white/[.06]; }
+  .eyebrow { @apply text-[11px] font-extrabold uppercase tracking-[.19em] text-black/45 dark:text-white/45; }
+  .button-primary { @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-black focus:outline-none focus-visible:ring-4 focus-visible:ring-lime/60 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 dark:bg-lime dark:text-ink; }
+  .button-secondary { @apply inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white/70 px-5 py-3 text-sm font-bold transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus-visible:ring-4 focus-visible:ring-lime/60 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/15; }
+  .field { @apply w-full rounded-2xl border border-black/10 bg-white/70 px-4 py-3.5 text-sm outline-none transition placeholder:text-black/30 focus:border-black/30 focus:ring-4 focus:ring-lime/20 dark:border-white/10 dark:bg-white/5 dark:placeholder:text-white/30 dark:focus:border-white/30; }
+}
+
+.noise::after { content: ''; position: absolute; inset: 0; opacity: .025; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E"); }
+.grid-fade { background-image: linear-gradient(rgba(37,38,33,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(37,38,33,.045) 1px, transparent 1px); background-size: 52px 52px; mask-image: linear-gradient(to bottom, black, transparent 85%); }
+.dark .grid-fade { background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px); }
