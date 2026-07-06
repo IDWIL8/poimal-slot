@@ -5,8 +5,6 @@ export interface Slot {
   week: 1 | 2
   dayKey: string
   dayName: string
-  dayShort: string
-  date: string
   time: string
   status: SlotStatus
   bookingToken?: string
@@ -22,6 +20,8 @@ export interface Booking {
   personKey: string
   createdAt: string
   updatedAt: string
+  status?: 'active' | 'cancelled'
+  cancelledAt?: string
   notes?: AdminNotes
 }
 

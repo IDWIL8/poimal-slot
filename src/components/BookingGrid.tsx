@@ -44,7 +44,7 @@ export function BookingGrid({ slots, onSelect, onMine }: { slots: Slot[]; onSele
                 const daySlots = slots.filter((slot) => slot.week === week && slot.dayName === dayName)
                 return (
                   <div key={dayName} className="rounded-xl bg-black/[.025] p-1.5 dark:bg-white/[.025]">
-                    <div className="flex items-center justify-between px-1 pb-1.5"><p className="text-[9px] font-extrabold">{dayName}</p><p className="text-[8px] font-bold text-black/30 dark:text-white/30">{daySlots[0]?.dayShort}</p></div>
+                    <div className="px-1 pb-1.5"><p className="text-[9px] font-extrabold">{dayName}</p></div>
                     <div className="space-y-1">
                       {daySlots.map((slot) => (
                         <button key={slot.id} disabled={slot.status === 'booked'} onClick={() => slot.status === 'mine' ? onMine() : onSelect(slot)} className={cn('group w-full rounded-lg border px-2 py-1.5 text-left transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-lime/60', cardStyles[slot.status])}>

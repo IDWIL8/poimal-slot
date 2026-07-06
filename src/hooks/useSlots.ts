@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createSlots } from '../lib/slots'
+import { createSlots, normalizeSlotId } from '../lib/slots'
 import { getBooking, myBookingToken, subscribeToClaims } from '../services/bookingService'
 
 export function useSlots() {
@@ -10,13 +10,19 @@ export function useSlots() {
   useEffect(() => subscribeToClaims((items) => { setClaims(items); setLoading(false) }), [])
   useEffect(() => {
     const token = myBookingToken()
-    if (token) getBooking(token).then((booking) => setMineSlotId(booking?.slotId || null))
+    if (token) getBooking(token).then((booking) => setMineSlotId(booking ? normalizeSlotId(booking.slotId) : null))
+  }, [claims])
+
+  useEffect(() => {
+    const known = new Set(createSlots().map((slot) => slot.id))
+    const unmatched = claims.filter((claim) => !known.has(normalizeSlotId(claim.slotId))).map((claim) => claim.slotId)
+    if (unmatched.length) console.warn('[booking-sync] slotClaims не попали в grid', unmatched)
   }, [claims])
 
   const slots = useMemo(() => {
     const mine = myBookingToken()
     return createSlots().map((slot, index) => {
-      const claim = claims.find((item) => item.slotId === slot.id || item.slotId === String(index))
+      const claim = claims.find((item) => normalizeSlotId(item.slotId) === slot.id || item.slotId === String(index))
       return { ...slot, bookedBy: claim?.bookedBy, status: claim ? (claim.token === mine || slot.id === mineSlotId ? 'mine' as const : 'booked' as const) : 'available' as const }
     })
   }, [claims, mineSlotId])

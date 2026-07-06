@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { slotById } from '../lib/slots'
-import { cancelBooking, getBooking, moveBooking, updateBooking } from '../services/bookingService'
+import { cancelBooking, getBooking, isActiveBooking, moveBooking, updateBooking } from '../services/bookingService'
 import { useSlots } from '../hooks/useSlots'
 import type { Booking } from '../types'
 
@@ -36,7 +36,7 @@ export function ManagePage() {
   }
 
   if (booking === undefined) return <div className="grid min-h-[70vh] place-items-center"><LoaderCircle className="animate-spin text-black/30" /></div>
-  if (!booking) return <section className="mx-auto max-w-xl px-5 py-24 text-center"><div className="surface p-10"><p className="text-5xl">🫥</p><h1 className="mt-5 text-3xl font-extrabold">Запись не найдена</h1><p className="mt-3 text-sm text-black/45 dark:text-white/45">Возможно, встреча была отменена или ссылка немного устала.</p><Link to="/" className="button-primary mt-7"><ArrowLeft size={16} /> Найти новый слот</Link></div></section>
+  if (!booking || !isActiveBooking(booking)) return <section className="mx-auto max-w-xl px-5 py-24 text-center"><div className="surface p-10"><p className="text-5xl">🫥</p><h1 className="mt-5 text-3xl font-extrabold">Активная запись не найдена</h1><p className="mt-3 text-sm text-black/45 dark:text-white/45">Возможно, встреча уже была отменена.</p><Link to="/" className="button-primary mt-7"><ArrowLeft size={16} /> Найти новый слот</Link></div></section>
 
   return (
     <section className="mx-auto max-w-4xl px-5 py-12 sm:px-8 sm:py-20">
@@ -53,7 +53,7 @@ export function ManagePage() {
           <div className="rounded-[28px] border border-red-500/10 bg-red-500/[.04] p-6"><p className="text-sm font-extrabold">Отменить встречу</p><p className="mt-1 text-xs text-black/40 dark:text-white/40">Слот снова станет доступен всем.</p><button disabled={busy} onClick={cancel} className="mt-4 inline-flex items-center gap-2 text-xs font-extrabold text-red-500 hover:text-red-600"><Trash2 size={15} /> Отменить запись</button></div>
         </div>
       </div>
-      {changing && <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="surface mt-5 p-6 sm:p-8"><h2 className="text-xl font-extrabold">Выберите новое время</h2><div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{slots.filter((slot) => slot.status === 'available').map((slot) => <button disabled={busy} key={slot.id} onClick={() => move(slot.id)} className="rounded-2xl border border-[#b6cfaa] bg-[#edf5e9] p-4 text-left text-ink transition hover:-translate-y-0.5 hover:shadow-md"><span className="block text-xs font-bold text-black/40">Неделя {slot.week} · {slot.dayShort}</span><span className="mt-1 block text-sm font-extrabold">{slot.time}</span></button>)}</div></motion.div>}
+      {changing && <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="surface mt-5 p-6 sm:p-8"><h2 className="text-xl font-extrabold">Выберите новое время</h2><div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{slots.filter((slot) => slot.status === 'available').map((slot) => <button disabled={busy} key={slot.id} onClick={() => move(slot.id)} className="rounded-2xl border border-[#b6cfaa] bg-[#edf5e9] p-4 text-left text-ink transition hover:-translate-y-0.5 hover:shadow-md"><span className="block text-xs font-bold text-black/40">{slot.week === 1 ? 'Планирование спринта' : 'Спринт-ревью'} · {slot.dayName}</span><span className="mt-1 block text-sm font-extrabold">{slot.time}</span></button>)}</div></motion.div>}
     </section>
   )
 }

@@ -18,12 +18,12 @@ service cloud.firestore {
     // Public clients subscribe to occupied slots and the participant names shown in the schedule.
     match /slotClaims/{slotId} {
       allow read: if true;
-      allow create: if !exists(/databases/$(database)/documents/slotClaims/$(slotId))
+      allow create: if isAdmin() || (!exists(/databases/$(database)/documents/slotClaims/$(slotId))
         && request.resource.data.keys().hasOnly(['personKey', 'bookedBy', 'createdAt'])
         && request.resource.data.bookedBy is string
         && request.resource.data.bookedBy.size() >= 2
         && existsAfter(/databases/$(database)/documents/bookingIdentities/$(request.resource.data.personKey))
-        && getAfter(/databases/$(database)/documents/bookingIdentities/$(request.resource.data.personKey)).data.slotId == slotId;
+        && getAfter(/databases/$(database)/documents/bookingIdentities/$(request.resource.data.personKey)).data.slotId == slotId);
       allow update: if isAdmin();
       allow delete: if isAdmin()
         || bookingFor(identityFor(resource.data.personKey).data.token).data.personKey == resource.data.personKey;
@@ -32,8 +32,8 @@ service cloud.firestore {
     // One deterministic SHA-256 identity document prevents duplicate bookings.
     match /bookingIdentities/{personKey} {
       allow read: if isAdmin();
-      allow create: if !exists(/databases/$(database)/documents/bookingIdentities/$(personKey))
-        && request.resource.data.keys().hasOnly(['token', 'slotId', 'createdAt']);
+      allow create: if isAdmin() || (!exists(/databases/$(database)/documents/bookingIdentities/$(personKey))
+        && request.resource.data.keys().hasOnly(['token', 'slotId', 'createdAt']));
       allow update, delete: if isAdmin()
         || bookingFor(resource.data.token).data.personKey == personKey;
     }
@@ -52,9 +52,9 @@ service cloud.firestore {
       allow update: if isAdmin() || (
         request.resource.data.token == resource.data.token
         && request.resource.data.personKey == resource.data.personKey
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['slotId', 'fullName', 'team', 'developmentGoal', 'updatedAt'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['slotId', 'fullName', 'team', 'developmentGoal', 'status', 'cancelledAt', 'updatedAt'])
       );
-      allow delete: if isAdmin() || token == resource.data.token;
+      allow delete: if false;
     }
 
     match /adminNotes/{token} {
