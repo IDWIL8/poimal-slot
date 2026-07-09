@@ -113,9 +113,8 @@ export async function createBooking(slotId: string, data: BookingFormData) {
   await runTransaction(db!, async (transaction) => {
     const slotRef = doc(db!, 'slotClaims', slotId)
     const identityRef = doc(db!, 'bookingIdentities', personKey)
-    const [slotSnap, identitySnap] = await Promise.all([transaction.get(slotRef), transaction.get(identityRef)])
+    const slotSnap = await transaction.get(slotRef)
     if (slotSnap.exists()) throw new Error('Этот слот уже занят')
-    if (identitySnap.exists()) throw new Error('У вас уже есть запись')
     transaction.set(slotRef, { personKey, bookedBy: data.fullName.trim(), createdAt: serverTimestamp() })
     transaction.set(identityRef, { token, slotId, createdAt: serverTimestamp() })
     transaction.set(doc(db!, 'bookings', token), {

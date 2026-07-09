@@ -34,7 +34,11 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create: if isAdmin() || (!exists(/databases/$(database)/documents/bookingIdentities/$(personKey))
         && request.resource.data.keys().hasOnly(['token', 'slotId', 'createdAt']));
-      allow update, delete: if isAdmin()
+      allow update: if isAdmin() || (
+        request.resource.data.token == resource.data.token
+        && bookingFor(resource.data.token).data.personKey == personKey
+      );
+      allow delete: if isAdmin()
         || bookingFor(resource.data.token).data.personKey == personKey;
     }
 
